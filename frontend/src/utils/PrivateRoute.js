@@ -1,10 +1,11 @@
 
 import {Route , Redirect} from 'react-router-dom';
 
-const PrivateRoute = ({children, ...rest}) => {
+export const PrivateRoute = ({children, ...rest}) => {
+    const isauthenticated = false;
     return (
         <Route {...rest}>
-            {children}
+            {!isauthenticated ? <Redirect to="/login" /> : children}
         </Route>
     )
 }
