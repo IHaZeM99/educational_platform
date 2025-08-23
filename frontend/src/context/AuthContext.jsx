@@ -1,5 +1,5 @@
 import React, {createContext, useContext, useReducer , useEffect} from 'react';
-import {auth, authServices} from '../services/authServices'
+import {authServices} from '../services/authServices'
 
 const AuthContext = createContext();
 
@@ -89,9 +89,9 @@ export function AuthProvider({children}) {
     }
 
     return (
-        <authContext.Provider value={value}>
+        <AuthContext.Provider value={value}>
             {children}
-        </authContext.Provider>
+        </AuthContext.Provider>
     )
 }
 

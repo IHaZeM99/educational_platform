@@ -1,6 +1,6 @@
 import api from './api';
 
-export const auth = {
+export const authServices = {
     login: async (Credential) => {
         const response = await api.post('/auth/login', Credential);
         return response.data;

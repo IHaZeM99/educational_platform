@@ -37,15 +37,9 @@ class RegisterView(APIView):
             return Response({"user": UserSerializer(user).data}, status=201)
         return Response(serializer.errors, status=400)
 
-# Login and token refresh handled by SimpleJWT views
+class UserView(APIView):
+    permission_classes = [IsAuthenticated]
 
-# class LogoutView(APIView):
-#     permission_classes = [IsAuthenticated]
-#     def post(self, request):
-#         try:
-#             refresh_token = request.data.get("refresh")
-#             token = RefreshToken(refresh_token)
-#             token.blacklist()
-#             return Response({"message": "Successfully logged out."}, status=200)
-#         except Exception:
-#             return Response({"error": "Invalid token."}, status=400)
+    def get(self, request):
+        user = request.user
+        return Response({"user": UserSerializer(user).data}, status=200)

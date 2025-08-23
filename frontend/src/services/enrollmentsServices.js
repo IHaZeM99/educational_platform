@@ -2,7 +2,7 @@
 
 import api from './api';
 
-export const enrollment = {
+export const enrollmentServices = {
     enrollInCourse: async (courseId) => {
         const response = await api.post(`courses/${courseId}/enrollments/create/`);
         return response.data;

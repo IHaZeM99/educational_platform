@@ -1,8 +1,8 @@
 import api from './api';
 
-export const course = {
+export const courseServices = {
     getAllCourses: async () => {
-        const response = await api.get('/courses/', {params});
+        const response = await api.get('/courses/');
         return response.data;
     },
 

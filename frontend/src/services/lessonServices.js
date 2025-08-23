@@ -1,7 +1,7 @@
 
 import api from './api';
 
-export const lesson = {
+export const lessonServices = {
   create: async (courseId, data) => {
     const response = await api.post(`courses/${courseId}/lessons/create/`, data);
     return response.data;
