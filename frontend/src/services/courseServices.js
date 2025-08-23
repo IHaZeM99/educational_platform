@@ -12,17 +12,17 @@ export const course = {
     },
 
     createCourse: async (courseData) => {
-        const response = await api.post('/courses/', courseData);
+        const response = await api.post('/courses/create/', courseData);
         return response.data;
     },
 
     updateCourse: async (id, courseData) => {
-        const response = await api.put(`/courses/${id}/`, courseData);
+        const response = await api.put(`/courses/${id}/update/`, courseData);
         return response.data;
     },
 
     deleteCourse: async (id) => {
-        const response = await api.delete(`/courses/${id}/`);
+        const response = await api.delete(`/courses/${id}/delete/`);
         return response.data;
     }
 }

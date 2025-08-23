@@ -25,7 +25,22 @@ api.interceptors.response.use(
     async (error) => {
         if ( error.response?.status === 401) {
             // Handle token expiration or unauthorized access
-            localStorage.removeItem('authTokens');
+            if(localStorage.getItem('refresh')) {
+                const refreshToken = JSON.parse(localStorage.getItem('refresh'));
+                try {
+                    const response = await api.post('/auth/refresh', { token: refreshToken });
+                    if (response.status === 200) {
+                        localStorage.setItem('accessToken', JSON.stringify(response.data.accessToken));
+                        localStorage.setItem('refreshToken', JSON.stringify(response.data.refreshToken));
+                        // Retry the original request
+                        return api.request(error.config);
+                    }
+                } catch (refreshError) {
+                    console.error('Refresh token failed:', refreshError);
+                }
+            }
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             window.location.href = '/login';
         }
         return Promise.reject(error);

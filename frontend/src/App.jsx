@@ -7,7 +7,7 @@ import Layout from "./components/Layout";
 import LandingPage from "./pages/LandingPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
-import CourseDetailsPage from "./pages/CourseDetailPage";
+import CourseDetailsPage from "./pages/CourseDetailsPage";
 import CreateCoursePage from "./pages/CreateCoursePage";
 import EditCoursePage from "./pages/EditCoursePage";
 import InstructorDashboard from "./pages/InstructorDashboard";
