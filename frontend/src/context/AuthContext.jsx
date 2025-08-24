@@ -3,6 +3,7 @@ import {authServices} from '../services/authServices'
 
 const AuthContext = createContext();
 
+
 const initialState = {
     user:null,
     isAuthenticated:false,
@@ -76,6 +77,15 @@ export function AuthProvider({children}) {
         }
     }
 
+    const register = async (credentials) => {
+        try {
+            const data = await authServices.register(credentials);
+        } catch (error) {
+            dispatch({ type: 'AUTH_FAILURE', payload: error.response?.data?.message || 'Registration failed' });
+            throw error;
+        }
+    }
+
     
     const logout = () => {
         authServices.logout();
@@ -85,7 +95,8 @@ export function AuthProvider({children}) {
     const value = {
         ...state,
         login,
-        logout
+        logout,
+        register
     }
 
     return (

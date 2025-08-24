@@ -11,7 +11,7 @@ const api = axios.create({
 
 api.interceptors.request.use(
     (config) => {
-        const token = JSON.parse(localStorage.getItem('accessToken'));
+        const token = localStorage.getItem('accessToken');
         if (token) {
             config.headers['Authorization'] = `Bearer ${token}`;
         }
@@ -25,13 +25,13 @@ api.interceptors.response.use(
     async (error) => {
         if ( error.response?.status === 401) {
             // Handle token expiration or unauthorized access
-            if(localStorage.getItem('refresh')) {
-                const refreshToken = JSON.parse(localStorage.getItem('refresh'));
+            if(localStorage.getItem('refreshToken')) {
+                const refreshToken = localStorage.getItem('refreshToken');
                 try {
-                    const response = await api.post('/auth/refresh', { token: refreshToken });
+                    const response = await api.post('/auth/refresh/', { refresh: refreshToken });
                     if (response.status === 200) {
-                        localStorage.setItem('accessToken', JSON.stringify(response.data.accessToken));
-                        localStorage.setItem('refreshToken', JSON.stringify(response.data.refreshToken));
+                        localStorage.setItem('accessToken', response.data.access);
+                        localStorage.setItem('refreshToken', response.data.refresh);
                         // Retry the original request
                         return api.request(error.config);
                     }
