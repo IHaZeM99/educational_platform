@@ -23,12 +23,21 @@ class EnrollmentCreateView(generics.CreateAPIView):
     serializer_class = EnrollmentSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer):
+    def create(self, request, *args, **kwargs):
         course_id = self.kwargs.get('course_pk')
-        course = Course.objects.get(pk=course_id)
-        if not course:
+        try:
+            course = Course.objects.get(pk=course_id)
+        except Course.DoesNotExist:
             return Response({'error': 'Course not found.'}, status=404)
-        serializer.save(student=self.request.user, course=course)
+        
+        # Check if already enrolled
+        if Enrollment.objects.filter(student=request.user, course=course).exists():
+            return Response({'error': 'You are already enrolled in this course.'}, status=400)
+        
+        # Create enrollment directly
+        enrollment = Enrollment.objects.create(student=request.user, course=course)
+        serializer = self.get_serializer(enrollment)
+        return Response(serializer.data, status=201)
 
 class EnrollmentDeleteView(generics.DestroyAPIView):
     queryset = Enrollment.objects.all()

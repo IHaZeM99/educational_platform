@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Toaster } from "react-hot-toast";
 import PrivateRoute from "./utils/PrivateRoute";
-import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
+import { EnrollmentProvider } from "./context/EnrollmentContext.jsx";
 
 import { Layout } from "./components/Layout";
 import { LandingPage } from "./pages/LandingPage";
@@ -41,12 +42,14 @@ function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <Router>
-          <Layout>
-            <AppRoutes />
-          </Layout>
-          <Toaster position="top-right" />
-        </Router>
+        <EnrollmentProvider>
+          <Router>
+            <Layout>
+              <AppRoutes />
+            </Layout>
+            <Toaster position="top-right" />
+          </Router>
+        </EnrollmentProvider>
       </AuthProvider>
     </QueryClientProvider>
   );
