@@ -2,13 +2,17 @@
 import {useAuth} from '../context/AuthContext.jsx';
 import {useNavigate} from 'react-router-dom'
 import Swal from 'sweetalert2';
+import { useEffect } from 'react';
 
 export const RegisterPage = () => {
     const { register , isAuthenticated } = useAuth();
     const navigate = useNavigate();
-    if(isAuthenticated) {
-        navigate('/'); // Redirect to home if already authenticated
-    }
+    
+    useEffect(() => {
+        if(isAuthenticated) {
+            navigate('/'); // Redirect to home if already authenticated
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -102,6 +106,9 @@ export const RegisterPage = () => {
                     <button className="btn btn-primary w-full" type="submit">
                         Register
                     </button>
+                    <div className="mt-4 text-sm text-center">
+                        Already have an account? <a href="/login" className="text-blue-500">Login</a>
+                    </div>
                 </form>
             </div>
         </div>

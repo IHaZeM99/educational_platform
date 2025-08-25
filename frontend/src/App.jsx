@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import PrivateRoute from "./utils/PrivateRoute";
 import { AuthProvider, useAuth } from "./context/AuthContext.jsx";
 import { EnrollmentProvider } from "./context/EnrollmentContext.jsx";
+import { InstractorProvider } from "./context/InstractorContext.jsx";
 
 import { Layout } from "./components/Layout";
 import { LandingPage } from "./pages/LandingPage";
@@ -32,7 +33,7 @@ function AppRoutes() {
         <Route path="/create-course" element={<CreateCoursePage />} />
         <Route path="/instructor" element={<InstructorDashboard />} />
         <Route path="/dashboard" element={<StudentDashboard />} />
-        <Route path="/edit-course" element={<EditCoursePage />} />
+        <Route path="/edit-course/:id" element={<EditCoursePage />} />
       </Route>
     </Routes>
   );
@@ -43,12 +44,14 @@ function App() {
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <EnrollmentProvider>
-          <Router>
-            <Layout>
-              <AppRoutes />
-            </Layout>
-            <Toaster position="top-right" />
-          </Router>
+          <InstractorProvider>
+            <Router>
+              <Layout>
+                <AppRoutes />
+              </Layout>
+              <Toaster position="top-right" />
+            </Router>
+          </InstractorProvider>
         </EnrollmentProvider>
       </AuthProvider>
     </QueryClientProvider>

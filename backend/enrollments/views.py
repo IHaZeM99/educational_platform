@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from rest_framework import generics
+from rest_framework.views import APIView
 
 from courses.models import Course
 from .models import Enrollment
 from .serializers import EnrollmentSerializer
 from rest_framework.permissions import IsAuthenticated  
 from rest_framework.response import Response
+from rest_framework import status
 
 # Create your views here.
 
@@ -39,12 +41,18 @@ class EnrollmentCreateView(generics.CreateAPIView):
         serializer = self.get_serializer(enrollment)
         return Response(serializer.data, status=201)
 
-class EnrollmentDeleteView(generics.DestroyAPIView):
-    queryset = Enrollment.objects.all()
-    serializer_class = EnrollmentSerializer
+class EnrollmentDeleteView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def perform_destroy(self, instance):
-        if instance.student != self.request.user:
-            return Response({'error': 'You can only delete your own enrollments.'}, status=403)
-        instance.delete()
+    def delete(self, request, course_pk):
+        try:
+            course = Course.objects.get(pk=course_pk)
+        except Course.DoesNotExist:
+            return Response({'error': 'Course not found.'}, status=status.HTTP_404_NOT_FOUND)
+        
+        try:
+            enrollment = Enrollment.objects.get(student=request.user, course=course)
+            enrollment.delete()
+            return Response({'message': 'Successfully withdrawn from course.'}, status=status.HTTP_200_OK)
+        except Enrollment.DoesNotExist:
+            return Response({'error': 'You are not enrolled in this course.'}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query";
 import { courseServices } from "../services/courseServices";
 import { CourseCard } from "../components/CourseCard";
@@ -8,7 +7,6 @@ const fetchCourses = () => {
 };
 
 export const LandingPage = () => {
-  
   const {
     data: courses,
     isLoading,
@@ -36,16 +34,19 @@ export const LandingPage = () => {
           </div>
         </div>
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses?.map(course => (
-          <CourseCard 
-            key={course.id} 
-            course={course}
-          />
-        ))}
+      <div className="bg-base-300 rounded-lg p-6 w-full">
+        {courses?.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses?.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+        ) : (
+          <>
+            <p className="text-gray-500 text-center">No courses available.</p>
+          </>
+        )}
       </div>
-
     </div>
   );
 };

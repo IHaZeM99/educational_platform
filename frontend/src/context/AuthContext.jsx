@@ -55,9 +55,12 @@ export function AuthProvider({children}) {
         if(token) {
             authServices.getUser()
             .then(user => dispatch({ type: 'AUTH_SUCCESS', payload: user }))
-            .catch(error => dispatch({ type: 'AUTH_FAILURE', payload: error.message }));
-        } else {
-            dispatch({ type: 'AUTH_FAILURE', payload: 'No token found' });
+            .catch(error => {
+                
+                localStorage.removeItem('accessToken');
+                localStorage.removeItem('refreshToken');
+                dispatch({ type: 'LOGOUT' });
+            });
         }
     }, []);
 

@@ -1,13 +1,17 @@
 
 import {useAuth} from '../context/AuthContext.jsx';
 import {useNavigate} from 'react-router-dom'
+import { useEffect } from 'react';
 
 export const LoginPage = () => {
     const { login , isAuthenticated } = useAuth();
     const navigate = useNavigate();
-    if(isAuthenticated) {
-        navigate('/'); // Redirect to home if already authenticated
-    }
+    
+    useEffect(() => {
+        if(isAuthenticated) {
+            navigate('/'); // Redirect to home if already authenticated
+        }
+    }, [isAuthenticated, navigate]);
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -52,6 +56,9 @@ export const LoginPage = () => {
                     <button className="btn btn-primary w-full" type="submit">
                         Login
                     </button>
+                    <div className="mt-4 text-sm text-center">
+                        Don't have an account? <a href="/register" className="text-blue-500">Register</a>
+                    </div>
                 </form>
             </div>
         </div>

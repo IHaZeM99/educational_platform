@@ -14,7 +14,7 @@ export const enrollmentServices = {
     },
 
     withdrawFromCourse: async (courseId) => {
-        const response = await api.post(`courses/${courseId}/enrollments/delete/`);
+        const response = await api.delete(`courses/${courseId}/enrollments/delete/`);
         return response.data;
     }
 }

@@ -1,13 +1,25 @@
 
 import { useNavigate } from 'react-router-dom';
 import { useEnrollment } from '../context/EnrollmentContext';
+import { useAuth } from '../context/AuthContext'
 import Swal from 'sweetalert2';
 
 export const CourseCard = ({ course }) => {
   const navigate = useNavigate();
   const { enrollInCourse, isEnrolled } = useEnrollment();
+  const { isAuthenticated } = useAuth();
 
   const onEnroll = async(courseId) => {
+    if(!isAuthenticated) {
+      Swal.fire({
+        title: 'Unauthorized',
+        text: 'You need to be logged in to enroll in a course.',
+        icon: 'warning',
+        confirmButtonText: 'OK'
+      });
+      return;
+    }
+
     const result = await enrollInCourse(courseId);
     
     if (result.success) {

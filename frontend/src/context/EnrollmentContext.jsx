@@ -42,6 +42,17 @@ export const EnrollmentProvider = ({ children }) => {
     }
   };
 
+  const withdrawFromCourse = async (courseId) => {
+    try {
+      await enrollmentServices.withdrawFromCourse(courseId);
+      // Refresh enrolled courses after successful withdrawal
+      await fetchEnrolledCourses();
+      return { success: true };
+    } catch (error) {
+      return { success: false, error };
+    }
+  };
+
   const isEnrolled = (courseId) => {
     return enrolledCourses.some(enrollment => enrollment.course === courseId);
   };
@@ -52,7 +63,8 @@ export const EnrollmentProvider = ({ children }) => {
     isLoading,
     enrollInCourse,
     isEnrolled,
-    fetchEnrolledCourses
+    fetchEnrolledCourses,
+    withdrawFromCourse
   };
 
   return (
