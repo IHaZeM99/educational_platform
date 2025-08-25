@@ -1,12 +1,17 @@
-import { useParams } from "react-router-dom";
+import { useParams , useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { courseServices } from "../services/courseServices";
 import { lessonServices } from "../services/lessonServices"
 import { useState } from "react";
+import { useEnrollment } from "../context/EnrollmentContext.jsx";
+import { useAuth } from "../context/AuthContext.jsx"
 
 export const CourseDetailsPage = () => {
   const { id } = useParams(); 
   const [selectedLesson, setSelectedLesson] = useState(null);
+  const { isEnrolled } = useEnrollment();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const {
     data: course,
@@ -24,7 +29,11 @@ export const CourseDetailsPage = () => {
   } = useQuery({
     queryKey: ["lessons", id],
     queryFn: () => lessonServices.getByCourseId(id),
-    enabled: !!id, // Only fetch lessons if we have a course ID
+    enabled: !!id && !!course && (
+      (user && isEnrolled(id)) || 
+      (user && course.instructor.id === user.user.id) ||
+      !user
+    ), // Only fetch lessons if user has access
   });
 
   if (courseLoading) {
@@ -45,6 +54,18 @@ export const CourseDetailsPage = () => {
     );
   }
 
+  if (user && course && !isEnrolled(id) && course.instructor.id !== user.user.id) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <div className="alert alert-error">
+          <span>You are not enrolled in this course and you are not the instructor.</span>
+          <button className="btn btn-primary" onClick={() => navigate("/")}>Go to Courses</button>
+        </div>
+      </div>
+    );
+  }
+  console.log(lessons);
+
   return (
     <div className="container mx-auto px-4 py-8">
       
@@ -52,10 +73,10 @@ export const CourseDetailsPage = () => {
         <div className="hero-content text-center">
           <div className="max-w-2xl">
             <h1 className="text-4xl font-bold mb-4">{course?.title}</h1>
-            <p className="text-lg mb-4">{course?.description}</p>
+            {/* <p className="text-lg mb-4">{course?.description}</p>
             <div className="flex justify-center items-center gap-4 text-sm">
               <span>by {course?.instructor?.username}</span>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>
@@ -95,8 +116,13 @@ export const CourseDetailsPage = () => {
         <div className="lg:col-span-1">
           <div className="card bg-base-100 shadow-xl">
             <div className="card-body">
-              <h2 className="card-title mb-4">Course Lessons</h2>
-              
+              <div className="flex justify-between items-center">
+                <h2 className="card-title mb-4">Course Lessons</h2>
+                {user.user.user_type === 'instructor' && (
+                  <button className="btn btn-primary btn-sm" onClick={() => navigate(`/add-lesson/${id}`)}>Add Lesson</button>
+                )}
+              </div>
+
               {lessonsLoading ? (
                 <div className="flex justify-center">
                   <span className="loading loading-spinner"></span>
@@ -134,9 +160,9 @@ export const CourseDetailsPage = () => {
                     <div className="mt-4 p-4 bg-base-200 rounded-lg">
                       <h4 className="font-semibold mb-2">{selectedLesson.title}</h4>
                       <p className="text-sm text-base-content/70 mb-3">{selectedLesson.content}</p>
-                      {selectedLesson.video_url && (
+                      {selectedLesson.videoUrl && (
                         <a 
-                          href={selectedLesson.video_url} 
+                          href={selectedLesson.videoUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
                           className="btn btn-primary btn-sm"

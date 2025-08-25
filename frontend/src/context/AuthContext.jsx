@@ -52,21 +52,37 @@ export function AuthProvider({children}) {
 
     useEffect(() => {
         const token = localStorage.getItem('accessToken');
-        if(token) {
+        const refreshToken = localStorage.getItem('refreshToken');
+        
+        if(token && refreshToken) {
             authServices.getUser()
-            .then(user => dispatch({ type: 'AUTH_SUCCESS', payload: user }))
+            .then(user => {
+                dispatch({ type: 'AUTH_SUCCESS', payload: user });
+            })
             .catch(error => {
-                
+                console.log('Token validation failed:', error);
+                // Clear invalid tokens
                 localStorage.removeItem('accessToken');
                 localStorage.removeItem('refreshToken');
+                localStorage.removeItem('user');
                 dispatch({ type: 'LOGOUT' });
             });
+        } else {
+            // If either token is missing, clear everything
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            localStorage.removeItem('user');
+            dispatch({ type: 'LOGOUT' });
         }
     }, []);
 
     const login = async (credentials) => {
         dispatch({type : 'AUTH_START'});
         try {
+            // Clear any existing tokens first
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
+            
             const data = await authServices.login(credentials);
             localStorage.setItem('accessToken', data.access);
             localStorage.setItem('refreshToken', data.refresh);
@@ -75,6 +91,9 @@ export function AuthProvider({children}) {
             dispatch({ type: 'AUTH_SUCCESS', payload: user });
             return user;
         } catch (error) {
+            // Clear tokens on login failure
+            localStorage.removeItem('accessToken');
+            localStorage.removeItem('refreshToken');
             dispatch({ type: 'AUTH_FAILURE', payload: error.response?.data?.message || 'Login failed' });
             throw error;
         }
@@ -91,8 +110,14 @@ export function AuthProvider({children}) {
 
     
     const logout = () => {
+        // Clear tokens from localStorage
         authServices.logout();
+        
+        // Update state to logged out
         dispatch({ type: 'LOGOUT' });
+        
+        // Force a page reload to clear any cached data
+        window.location.href = '/';
     }
 
     const value = {

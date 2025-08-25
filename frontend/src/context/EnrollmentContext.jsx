@@ -54,7 +54,7 @@ export const EnrollmentProvider = ({ children }) => {
   };
 
   const isEnrolled = (courseId) => {
-    return enrolledCourses.some(enrollment => enrollment.course === courseId);
+    return enrolledCourses.some(enrollment => enrollment.course.id === parseInt(courseId));
   };
 
   const value = {

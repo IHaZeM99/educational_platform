@@ -15,6 +15,7 @@ import { CreateCoursePage } from "./pages/CreateCoursePage";
 import { EditCoursePage } from "./pages/EditCoursePage";
 import { InstructorDashboard } from "./pages/InstructorDashboard";
 import { StudentDashboard } from "./pages/StudentDashboard";
+import { AddLessonPage } from "./pages/AddLessonPage"
 
 const queryClient = new QueryClient();
 
@@ -26,7 +27,6 @@ function AppRoutes() {
       <Route path="/" element={<LandingPage />} />
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
-      <Route path="/courses/:id" element={<CourseDetailsPage />} />
 
       {/* Private Routes */}
       <Route element={<PrivateRoute isAuthenticated={isAuthenticated} />}>
@@ -34,6 +34,8 @@ function AppRoutes() {
         <Route path="/instructor" element={<InstructorDashboard />} />
         <Route path="/dashboard" element={<StudentDashboard />} />
         <Route path="/edit-course/:id" element={<EditCoursePage />} />
+        <Route path="/courses/:id" element={<CourseDetailsPage />} />
+        <Route path="/add-lesson/:id" element={<AddLessonPage />} />
       </Route>
     </Routes>
   );

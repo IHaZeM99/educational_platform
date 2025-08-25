@@ -2,6 +2,7 @@ from django.shortcuts import render
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.exceptions import PermissionDenied, ValidationError
 
 from .models import Course , Lesson
 from .serializers import CourseSerializer , LessonSerializer
@@ -93,28 +94,42 @@ class LessonCreateView(generics.CreateAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_create(self, serializer , request):
-        if not hasattr(request.user, 'user_type') or request.user.user_type != 'instructor':
-            return Response({'error': 'Only instructors can create lessons.'}, status=status.HTTP_403_FORBIDDEN)
+    def create(self, request, *args, **kwargs):
+        print("LessonCreateView - create method called!")
+        print("Request user:", request.user)
+        print("Request data:", request.data)
+        print("Course PK from URL:", kwargs.get('course_pk'))
+        return super().create(request, *args, **kwargs)
+
+    def perform_create(self, serializer):
+        print("LessonCreateView - perform_create called!")
+        print("User:", self.request.user)
+        print("Data:", self.request.data)
+        print("Course PK:", self.kwargs.get('course_pk'))
+        
+        if not hasattr(self.request.user, 'user_type') or self.request.user.user_type != 'instructor':
+            raise PermissionDenied('Only instructors can create lessons.')
+            
         course_pk = self.kwargs.get('course_pk')
         if not course_pk:
-            return Response({'error': 'Course ID is required.'}, status=status.HTTP_400_BAD_REQUEST)
+            raise ValidationError('Course ID is required.')
         
         course = Course.objects.filter(pk=course_pk).first()
         if not course:
-            return Response({'error': 'Course not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if course.instructor != request.user:
-            return Response({'error': 'You are not the instructor of this course.'}, status=status.HTTP_403_FORBIDDEN)
+            raise ValidationError('Course not found.')
+            
+        if course.instructor != self.request.user:
+            raise PermissionDenied('You are not the instructor of this course.')
         
+        print("All validations passed, saving lesson...")
         serializer.save(course=course)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
     
 class LessonUpdateView(generics.UpdateAPIView):
     serializer_class = LessonSerializer
     permission_classes = [IsAuthenticated]
 
-    def perform_update(self, serializer , request):
-        if not hasattr(request.user, 'user_type') or request.user.user_type != 'instructor':
+    def perform_update(self, serializer):
+        if not hasattr(self.request.user, 'user_type') or self.request.user.user_type != 'instructor':
             return Response({'error': 'Only instructors can update lessons.'}, status=status.HTTP_403_FORBIDDEN)
         course_pk = self.kwargs.get('course_pk')
         if not course_pk:
@@ -123,11 +138,10 @@ class LessonUpdateView(generics.UpdateAPIView):
         course = Course.objects.filter(pk=course_pk).first()
         if not course:
             return Response({'error': 'Course not found.'}, status=status.HTTP_404_NOT_FOUND)
-        if course.instructor != request.user:
+        if course.instructor != self.request.user:
             return Response({'error': 'You are not the instructor of this course.'}, status=status.HTTP_403_FORBIDDEN)
 
         serializer.save(course=course)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class LessonDeleteView(generics.DestroyAPIView):

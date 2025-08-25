@@ -12,8 +12,15 @@ export const authServices = {
     },
 
     logout: () => {
+        // Clear all auth-related data from localStorage
         localStorage.removeItem('accessToken');
         localStorage.removeItem('refreshToken');
+        
+        // Clear any other cached auth data
+        localStorage.removeItem('user');
+        
+        // Clear session storage as well (if any)
+        sessionStorage.clear();
     },
 
     refresh: async () => {

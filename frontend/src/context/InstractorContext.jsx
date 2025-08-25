@@ -1,6 +1,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { courseServices } from '../services/courseServices';
+import { lessonServices } from '../services/lessonServices';
 import { useAuth } from './AuthContext';
 import Swal from 'sweetalert2';
 
@@ -66,6 +67,16 @@ export const InstractorProvider = ({ children }) => {
     return createdCourses.some(course => course.id === courseId);
   };
 
+  const addLesson = async (courseId, lessonData) => {
+    try {
+      await lessonServices.create(courseId, lessonData);
+      // Refresh created courses after successful addition
+      await fetchCreatedCourses();
+    } catch (error) {
+      console.error('Error adding lesson:', error);
+    }
+  };
+
   const value = {
     createdCourses,
     setCreatedCourses,
@@ -73,6 +84,7 @@ export const InstractorProvider = ({ children }) => {
     createCourse,
     deleteCourse,
     editCourse,
+    addLesson,
     isCreated,
     fetchCreatedCourses
   };
